@@ -73,7 +73,7 @@ export const deleteUser = asyncHandler((async (req, res) => {
 export const search = asyncHandler((async (req, res) => {
 
     const { body } = req
-    const users = await usersModel.find(body).select("-password")
+    const users = await usersModel.find(req.body)
     res.json({ message: "success", users })
 
 })

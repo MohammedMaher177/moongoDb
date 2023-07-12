@@ -3,6 +3,8 @@ import bcrypt from "bcrypt"
 
 import asyncHandler from 'express-async-handler'
 
+
+// 7-get all user 
 export const getALlUsers = asyncHandler(async (req, res) => {
     const users = await usersModel.find().select("-password")
     res.json({ message: "success", users })
@@ -14,7 +16,15 @@ export const getUserById = asyncHandler(async (req, res) => {
     res.json({ message: "success", users })
 }
 )
+export const search = asyncHandler((async (req, res) => {
 
+    const { body } = req
+    const users = await usersModel.find(req.body)
+    res.json({ message: "success", users })
+
+})
+)
+// 1-sign up ( email must be unique ) 
 export const addUser = asyncHandler(async (req, res) => {
     const { name, email, password, rePassword, age, gender, confirmEmail } = req.body
     const hashPasword = bcrypt.hashSync(password, 8)
@@ -30,7 +40,7 @@ export const addUser = asyncHandler(async (req, res) => {
     user.password = ''
     return res.json({ message: "success", user })
 })
-
+//2-sign in 
 export const login = asyncHandler(async (req, res) => {
     const { email, password } = req.body
     const user = await usersModel.findOne({ email })
@@ -44,7 +54,7 @@ export const login = asyncHandler(async (req, res) => {
     user.password = ""
     return res.json({ message: "success", user })
 })
-
+//3-update user
 export const updateUser = asyncHandler((async (req, res) => {
     const { name, email, password, age, gender } = req.body;
     const { id } = req.params
@@ -54,7 +64,7 @@ export const updateUser = asyncHandler((async (req, res) => {
 
 })
 )
-
+//4-delete user
 export const deleteUser = asyncHandler((async (req, res) => {
     const { id } = req.params
     // return res.json({message: "success", name, email, password, age, gender, id})
@@ -70,11 +80,23 @@ export const deleteUser = asyncHandler((async (req, res) => {
 })
 )
 
-export const search = asyncHandler((async (req, res) => {
 
-    const { body } = req
-    const users = await usersModel.find(req.body)
-    res.json({ message: "success", users })
 
-})
+/*
+5-search for user where his name start with "X" and age less than Y=>   (X,Y => variables)
+6-search for user where his age is between X and Y
+ */
+
+export const searchByName = asyncHandler((async (req, res) => {
+    const { minAge, maxAge } = req.body
+    usersModel.find({ name: { $regex: '^X', $options: 'i' }, age: { $lt: maxAge, $gte: minAge } })
+        .then(users => {
+            res.json({ message: "success", users })
+        })
+        .catch(err => {
+            return res.json({ message: "not found", err })
+        });
+
+}
+)
 )

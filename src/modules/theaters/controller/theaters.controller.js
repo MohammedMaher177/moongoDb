@@ -17,3 +17,4 @@ export const search = async (req, res) => {
     const theater = await theatersModel.find(   body)
     res.json({ message: "success", theater })
 }
+

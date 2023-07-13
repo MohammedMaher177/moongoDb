@@ -2,7 +2,7 @@ import moviesModel from "../../../../DB/movies.model.js"
 
 
 export const getAllMovies = async (req, res) => {
-    await moviesModel.find()
+    await moviesModel.find().limit(10)
     .then(result => res.json({message: "success", result}))
     .catch(error=> res.json({message: "error", error}))
 }
@@ -13,3 +13,5 @@ export const getSubMovie = async (req, res) => {
     .then(result => res.json({message: "success", result}))
     .catch(error=> res.json({message: "error", error}))
 }
+
+

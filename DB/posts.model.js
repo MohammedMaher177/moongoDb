@@ -18,6 +18,13 @@ const postSchema = new Schema({
   createdAt: {
     type: Date,
     default: Date.now
+  },
+  postComments:{
+    type:[{
+      user_id : {type:Types.ObjectId, required: true},
+      content:String
+    }],
+    default:[]
   }
 });
 

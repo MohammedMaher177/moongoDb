@@ -67,7 +67,7 @@ export const updateUser = asyncHandler((async (req, res) => {
 })
 )
 //4-delete user
-export const deleteUser = asyncHandler((async (req, res) => {
+export const deleteUser = asyncHandler(async (req, res) => {
     const { id } = req.params
     // return res.json({message: "success", name, email, password, age, gender, id})
 
@@ -80,7 +80,7 @@ export const deleteUser = asyncHandler((async (req, res) => {
 
     }
 })
-)
+
 
 
 

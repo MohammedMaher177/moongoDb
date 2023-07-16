@@ -2,6 +2,7 @@ import postsModel from "../../../../DB/posts.model.js"
 import usersModel from "../../../../DB/users.model.js"
 import asyncHandler from 'express-async-handler'
 import { updatesutil } from "../../../utils/updates.js"
+import { connect } from "mongoose"
 
 
 export const getAllPosts = asyncHandler(async (req, res) => {
@@ -74,7 +75,7 @@ export const updatePost = asyncHandler(async (req, res) => {
 
         return res.json({ message: "Catch Error", param: result.Error })
     }
-    return res.json({ message: "success",param:"Post updated successfully", result })
+    return res.json({ message: "success", param: "Post updated successfully", result })
 })
 
 //4- sort posts descending (By date)
@@ -83,4 +84,19 @@ export const getSortedposts = asyncHandler(async (req, res) => {
     await postsModel.find().sort({ createdAt: -1 })
         .then(result => res.json({ message: "success", result }))
         .catch(error => res.json({ message: "error", error }))
+})
+
+
+/*add comment to post */
+export const addPostComments = asyncHandler(async (req, res) => {
+    const { user_id, post_id, content } = req.body;
+    const post = await postsModel.findById(post_id)
+    if (!post) {
+        return res.json({ message: "Error", param: "post ID Not Found" })
+    }
+    const updates = {user_id , content}
+    const new_post = await postsModel.findByIdAndUpdate(post_id, 
+        { $push: { postComments: updates } },
+        { new: true },)
+    return res.json({ new_post })
 })

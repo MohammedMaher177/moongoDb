@@ -6,6 +6,7 @@ const commentsShema = new Schema({
     name: { type: String, require: true },
     email: { type: String, require: true },
     movie_id: { type: Types.ObjectId, ref: "movie" },
+    user_id: { type: Types.ObjectId, ref: "user" },
     text: { type: String, require: true },
     date: { type: Date, default: Date.now }
 })

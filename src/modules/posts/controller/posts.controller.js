@@ -5,7 +5,12 @@ import { updatesutil } from "../../../utils/updates.js"
 
 
 export const getAllPosts = asyncHandler(async (req, res) => {
-    await postsModel.find()
+    await postsModel.find().populate([
+        {
+            path: "authorId",
+            select: "-password"
+        }
+    ])
         .then(result => res.json({ message: "success", result }))
         .catch(error => res.json({ message: "error", error }))
 })

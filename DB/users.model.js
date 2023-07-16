@@ -7,6 +7,7 @@ const usersSchema = new Schema({
     email: {type: String, require: true, unique: true},
     password: {type:String, require:true},
     age:Number,
+    phone:String,
     gender:{ type: String, enum:['Male', 'Female', 'Not Selected'] },
     confirmEmail:{ type: Boolean, default: false } 
 },{ timestamps: true })

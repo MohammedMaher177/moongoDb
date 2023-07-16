@@ -26,7 +26,7 @@ export const search = asyncHandler((async (req, res) => {
 )
 // 1-sign up ( email must be unique ) 
 export const addUser = asyncHandler(async (req, res) => {
-    const { name, email, password, rePassword, age, gender, confirmEmail } = req.body
+    const { name, email, password, rePassword, age, gender, confirmEmail, phone } = req.body
     const hashPasword = bcrypt.hashSync(password, 8)
     if (password != rePassword) {
         return res.json({ message: "Error", param: "Password and RePassword Mismatch" })
@@ -35,7 +35,7 @@ export const addUser = asyncHandler(async (req, res) => {
     if (checkUser) {
         return res.json({ message: "Error", param: "Email Already Exist" })
     }
-    const newUser = new usersModel({ name, email, password: hashPasword, age, gender })
+    const newUser = new usersModel({ name, email, password: hashPasword, age, gender, phone })
     const user = await newUser.save()
     user.password = ''
     return res.json({ message: "success", user })
@@ -59,7 +59,7 @@ export const updateUser = asyncHandler((async (req, res) => {
     const { name, email, password, age, gender } = req.body;
     const { id } = req.params
     const hashPasword = bcrypt.hashSync(password, 8)
-    const users = await usersModel.updateOne({ _id: id }, { name, email, hashPasword, age, gender })
+    const users = await usersModel.updateOne({ _id: id }, { name, email, hashPasword, age, gender, phone })
     return res.json({ message: "success", users })
 
 })
@@ -82,7 +82,7 @@ export const deleteUser = asyncHandler((async (req, res) => {
 
 
 
-/*
+/*P
 5-search for user where his name start with "X" and age less than Y=>   (X,Y => variables)
 6-search for user where his age is between X and Y
  */

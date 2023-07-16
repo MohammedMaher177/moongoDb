@@ -2,6 +2,7 @@ import usersModel from "../../../../DB/users.model.js"
 import bcrypt from "bcrypt"
 
 import asyncHandler from 'express-async-handler'
+import postsModel from "../../../../DB/posts.model.js"
 
 
 // 7-get all user 
@@ -12,8 +13,9 @@ export const getALlUsers = asyncHandler(async (req, res) => {
 )
 export const getUserById = asyncHandler(async (req, res) => {
     const { id } = req.params
-    const users = await usersModel.findById(id).select("-password")
-    res.json({ message: "success", users })
+    const user = await usersModel.findById(id).select("-password")
+    const posts = await postsModel.find({ authorId: user._id })
+    res.json({ message: "success", user, posts })
 }
 )
 export const search = asyncHandler((async (req, res) => {

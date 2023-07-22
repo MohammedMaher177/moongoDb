@@ -13,6 +13,9 @@ const bootstrap = (app, express) => {
     app.use("/movies", moviesRouter)
     app.use("/posts", postsRouter)
     app.use("/comments", commentsRouter)
+    app.use((error, req, res, next) => {
+        return res.json({message: error.message, stack: error.stack})
+    })
 }
 
 export default bootstrap

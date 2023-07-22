@@ -27,11 +27,11 @@ export const search = asyncHandler((async (req, res) => {
 })
 )
 // 1-sign up ( email must be unique ) 
-export const addUser = asyncHandler(async (req, res) => {
+export const addUser = asyncHandler(async (req, res, next) => {
     const { name, email, password, rePassword, age, gender, confirmEmail, phone } = req.body
     const hashPasword = bcrypt.hashSync(password, 8)
     if (password != rePassword) {
-        return res.json({ message: "Error", param: "Password and RePassword Mismatch" })
+        return next(new Error("Password and RePassword Mismatch"))
     }
     const checkUser = await usersModel.findOne({ email })
     if (checkUser) {

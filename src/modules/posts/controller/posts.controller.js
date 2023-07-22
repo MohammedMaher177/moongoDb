@@ -18,6 +18,9 @@ export const getAllPosts = asyncHandler(async (req, res) => {
 export const getPostById = asyncHandler(async (req, res) => {
     const { id } = req.params
     await postsModel.findById(id)
+        .populate([{
+            path: "authorId"
+        }])
         .then(result => {
             if (!result) return res.json({ message: "Not Found", param: "Invalid Id" })
             return res.json({ message: "success", result })
@@ -94,8 +97,8 @@ export const addPostComments = asyncHandler(async (req, res) => {
     if (!post) {
         return res.json({ message: "Error", param: "post ID Not Found" })
     }
-    const updates = {user_id , content}
-    const new_post = await postsModel.findByIdAndUpdate(post_id, 
+    const updates = { user_id, content }
+    const new_post = await postsModel.findByIdAndUpdate(post_id,
         { $push: { postComments: updates } },
         { new: true },)
     return res.json({ new_post })

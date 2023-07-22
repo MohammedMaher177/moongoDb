@@ -1,5 +1,5 @@
 
-import { Schema, model } from "mongoose"
+import { Schema, Types, model } from "mongoose"
 
 
 const usersSchema = new Schema({
@@ -9,7 +9,8 @@ const usersSchema = new Schema({
     age:Number,
     phone:String,
     gender:{ type: String, enum:['Male', 'Female', 'Not Selected'] },
-    confirmEmail:{ type: Boolean, default: false } 
+    confirmEmail:{ type: Boolean, default: false },
+    firends:{type: [Types.ObjectId], require: true}
 },{ timestamps: true })
 
 const usersModel = model("user", usersSchema)

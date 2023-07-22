@@ -15,11 +15,19 @@ export const getAllPosts = asyncHandler(async (req, res) => {
         .then(result => res.json({ message: "success", result }))
         .catch(error => res.json({ message: "error", error }))
 })
+/*get post details */
 export const getPostById = asyncHandler(async (req, res) => {
     const { id } = req.params
     await postsModel.findById(id)
         .populate([{
-            path: "authorId"
+            path: "authorId",
+            select:"name email"
+        },{
+            path:"postComments.user_id",
+            select:"name email"
+        },{
+            path:"postLikes",
+            select:"name email"
         }])
         .then(result => {
             if (!result) return res.json({ message: "Not Found", param: "Invalid Id" })
@@ -82,13 +90,11 @@ export const updatePost = asyncHandler(async (req, res) => {
 })
 
 //4- sort posts descending (By date)
-
 export const getSortedposts = asyncHandler(async (req, res) => {
     await postsModel.find().sort({ createdAt: -1 })
         .then(result => res.json({ message: "success", result }))
         .catch(error => res.json({ message: "error", error }))
 })
-
 
 /*add comment to post */
 export const addPostComments = asyncHandler(async (req, res) => {
@@ -102,4 +108,41 @@ export const addPostComments = asyncHandler(async (req, res) => {
         { $push: { postComments: updates } },
         { new: true },)
     return res.json({ new_post })
+})
+
+/*like and unlike to post */
+export const postlike = asyncHandler(async (req, res, next) => {
+    const { userId, postId } = req.body;
+    const user = await usersModel.findById(userId);
+    if (!user) {
+        return next(new Error("In-Valid user ID"))
+    }
+    const checkPost = await postsModel.findById(postId)
+    if (!checkPost) {
+        return next(new Error("In-Valid Post ID"))
+    }
+    console.log(checkPost);
+    if (checkPost.postLikes.includes(userId)) {
+
+      const post = await postsModel.findByIdAndUpdate(postId, {
+            $pull:
+            {
+                postLikes: userId
+            }
+        },
+            { new: true })
+        return res.json({ message: 'success', param: "Un Like", post });
+    } else {
+
+        const post = await postsModel.findByIdAndUpdate(postId,
+            {
+                $push:
+                {
+                    postLikes: userId
+                }
+            },
+            { new: true })
+        return res.json({ message: 'success', param: "Like", post });
+    }
+    // .populate('postLikes');
 })

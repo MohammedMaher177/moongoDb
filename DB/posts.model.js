@@ -19,12 +19,16 @@ const postSchema = new Schema({
     type: Date,
     default: Date.now
   },
-  postComments:{
-    type:[{
-      user_id : {type:Types.ObjectId, required: true},
-      content:String
+  postComments: {
+    type: [{
+      user_id: { type: Types.ObjectId, required: true, ref: 'user' },
+      content: String
     }],
-    default:[]
+    default: []
+  },
+  postLikes: {
+    type: [{type: Types.ObjectId, ref: 'user',}],
+    default: []
   }
 });
 

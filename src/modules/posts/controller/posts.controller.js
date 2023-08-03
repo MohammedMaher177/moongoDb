@@ -95,7 +95,7 @@ export const updatePost = asyncHandler(async (req, res) => {
 
 //4- sort posts descending (By date)
 export const getSortedposts = asyncHandler(async (req, res) => {
-    await postsModel.find().sort({ createdAt: -1 })..populate([
+    await postsModel.find().sort({ createdAt: -1 }).populate([
         {
             path: "authorId",
             select: "-password"

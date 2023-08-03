@@ -21,13 +21,13 @@ export const getPostById = asyncHandler(async (req, res) => {
     await postsModel.findById(id)
         .populate([{
             path: "authorId",
-            select:"name email"
-        },{
-            path:"postComments.user_id",
-            select:"name email"
-        },{
-            path:"postLikes",
-            select:"name email"
+            select: "name email"
+        }, {
+            path: "postComments.user_id",
+            select: "name email"
+        }, {
+            path: "postLikes",
+            select: "name email"
         }])
         .then(result => {
             if (!result) return res.json({ message: "Not Found", param: "Invalid Id" })
@@ -38,7 +38,9 @@ export const getPostById = asyncHandler(async (req, res) => {
 
 //1- add post (make sure that user already exist)
 export const addPost = asyncHandler(async (req, res) => {
-    const { title, content, authorId } = req.body
+    const { title, content } = req.body
+    console.log(req.user);
+    const authorId = req.user._id
     const user = await usersModel.findById(authorId, "-password")
     if (user) {
         await postsModel.create({ title, content, authorId })
@@ -56,15 +58,16 @@ export const addPost = asyncHandler(async (req, res) => {
 //2- delete post (post creator only )
 export const deletePost = asyncHandler(async (req, res) => {
     const { id } = req.params
-    const { authorId } = req.body
+    const  authorId  = req.user._id
+    console.log(authorId);
     postsModel.findById(id)
         .then(result => {
             // console.log(result);
             if (!result) {
                 return res.json({ message: "Post Not Found" })
             }
-            if (result.authorId.toString() !== authorId) {
-                return res.json({ message: "error55", param: "Dont have premession" })
+            if (result.authorId.toString() !== authorId.toString()) {
+                return res.json({ message: "error", param: "Dont have premession" })
             }
             postsModel.findByIdAndDelete(id)
                 .then(result => res.json({ message: "succes", result }))
@@ -78,7 +81,8 @@ export const deletePost = asyncHandler(async (req, res) => {
 //3- update post (post owner only)
 export const updatePost = asyncHandler(async (req, res) => {
     const { id } = req.params
-    const { authorId, content, title } = req.body
+    const {  content, title } = req.body
+    const  authorId  = req.user._id
     const updates = { content, title }
     const result = await updatesutil(postsModel, id, authorId, updates)
     console.log(result.Error);
@@ -98,7 +102,8 @@ export const getSortedposts = asyncHandler(async (req, res) => {
 
 /*add comment to post */
 export const addPostComments = asyncHandler(async (req, res) => {
-    const { user_id, post_id, content } = req.body;
+    const { post_id, content } = req.body;
+    const user_id = req.user._id
     const post = await postsModel.findById(post_id)
     if (!post) {
         return res.json({ message: "Error", param: "post ID Not Found" })
@@ -112,7 +117,8 @@ export const addPostComments = asyncHandler(async (req, res) => {
 
 /*like and unlike to post */
 export const postlike = asyncHandler(async (req, res, next) => {
-    const { userId, postId } = req.body;
+    const { postId } = req.body;
+    const userId = req.user._id;
     const user = await usersModel.findById(userId);
     if (!user) {
         return next(new Error("In-Valid user ID"))
@@ -124,7 +130,7 @@ export const postlike = asyncHandler(async (req, res, next) => {
     console.log(checkPost);
     if (checkPost.postLikes.includes(userId)) {
 
-      const post = await postsModel.findByIdAndUpdate(postId, {
+        const post = await postsModel.findByIdAndUpdate(postId, {
             $pull:
             {
                 postLikes: userId

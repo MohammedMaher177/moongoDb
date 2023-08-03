@@ -59,7 +59,8 @@ export const getSubComment = asyncHandler(async (req, res) => {
 )
 
 export const addComment = asyncHandler(async (req, res) => {
-    const { movie_id, name, email, text, user_id } = req.body
+    const { movie_id, name, email, text} = req.body
+    const user_id =req.user._id
     const checkMovie = await moviesModel.findById(movie_id)
     const checkuser = await usersModel.findById(user_id)
     if (!checkMovie) {

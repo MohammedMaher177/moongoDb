@@ -1,5 +1,6 @@
 import usersModel from "../../../../DB/users.model.js"
 import bcrypt from "bcrypt"
+import jwt from "jsonwebtoken";
 
 import asyncHandler from 'express-async-handler'
 import postsModel from "../../../../DB/posts.model.js"
@@ -29,7 +30,7 @@ export const search = asyncHandler((async (req, res) => {
 // 1-sign up ( email must be unique ) 
 export const addUser = asyncHandler(async (req, res, next) => {
     const { name, email, password, rePassword, age, gender, confirmEmail, phone } = req.body
-    const hashPasword = bcrypt.hashSync(password, 8)
+    const hashPasword = bcrypt.hashSync(password, +process.env.HASH_SALT_ROUND)
     if (password != rePassword) {
         return next(new Error("Password and RePassword Mismatch"))
     }
@@ -53,16 +54,16 @@ export const login = asyncHandler(async (req, res) => {
     if (!match) {
         return res.json({ message: "Error", param: "In-Valid Email or Password" })
     }
-    user.password = ""
-    return res.json({ message: "success", user })
+    const token = jwt.sign({ id: user._id, name: user.name, email: user.email }, process.env.TOKEN_SIGNTURE)
+    return res.json({ message: "success", token })
 })
 //3-update user
 export const updateUser = asyncHandler((async (req, res) => {
-    const { name, email, password, age, gender } = req.body;
-    const { id } = req.params
-    const hashPasword = bcrypt.hashSync(password, 8)
-    const users = await usersModel.updateOne({ _id: id }, { name, email, hashPasword, age, gender, phone })
-    return res.json({ message: "success", users })
+    const { name, email, password, age, gender, phone } = req.body;
+    const { id } = req.user
+    const hashPasword = bcrypt.hashSync(password, +process.env.HASH_SALT_ROUND)
+    const user = await usersModel.updateOne({ _id: id }, { name, email, password: hashPasword, age, gender, phone })
+    return res.json({ message: "success", user })
 
 })
 )
@@ -90,8 +91,8 @@ export const deleteUser = asyncHandler(async (req, res) => {
  */
 
 export const searchByName = asyncHandler((async (req, res) => {
-    const { minAge, maxAge } = req.body
-    usersModel.find({ name: { $regex: '^X', $options: 'i' }, age: { $lt: maxAge, $gte: minAge } })
+    const { name } = req.body
+    usersModel.find({ name: { $regex: `^${name}`, $options: 'i' } })
         .then(users => {
             res.json({ message: "success", users })
         })

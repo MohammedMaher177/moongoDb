@@ -5,7 +5,7 @@ import moongose from "mongoose"
 //mongodb+srv://newUser:112233112233@atlascluster.o0ywtpx.mongodb.net/usersModel
 const connectionDb =async ()=> {
 
-    return await moongose.connect( 'mongodb+srv://momaherfrontend:Mohammed189199@cluster0.mbdwkdz.mongodb.net/sample_mflix')
+    return await moongose.connect( process.env.DB_CONNECTION)
     .then((result) => {
         // console.log(result);
         console.log("DB Connected");

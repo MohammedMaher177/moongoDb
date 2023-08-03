@@ -1,7 +1,11 @@
+import dotenv from 'dotenv';
+
+
+dotenv.config()
+
 import express from 'express'
 import bootstrap from './src/app.router.js';
 import cors from 'cors'
-
 
 
 const app = express();

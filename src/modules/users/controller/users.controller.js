@@ -55,7 +55,8 @@ export const login = asyncHandler(async (req, res) => {
         return res.json({ message: "Error", param: "In-Valid Email or Password" })
     }
     const token = jwt.sign({ id: user._id, name: user.name, email: user.email }, process.env.TOKEN_SIGNTURE)
-    return res.json({ message: "success", token })
+    user.password = ''
+    return res.json({ message: "success", token , user})
 })
 //3-update user
 export const updateUser = asyncHandler((async (req, res) => {

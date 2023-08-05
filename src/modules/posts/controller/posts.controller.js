@@ -82,12 +82,11 @@ export const deletePost = asyncHandler(async (req, res) => {
 export const updatePost = asyncHandler(async (req, res) => {
     const { id } = req.params
     const {  content, title } = req.body
-    const  authorId  = req.user._id
+    const  authorId  = req.user.id
     const updates = { content, title }
     const result = await updatesutil(postsModel, id, authorId, updates)
     console.log(result.Error);
     if (result.Error) {
-
         return res.json({ message: "Catch Error", param: result.Error })
     }
     return res.json({ message: "success", param: "Post updated successfully", result })

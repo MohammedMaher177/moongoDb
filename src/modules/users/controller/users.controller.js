@@ -15,7 +15,7 @@ export const getALlUsers = asyncHandler(async (req, res) => {
 export const getUserById = asyncHandler(async (req, res) => {
     const { id } = req.params
     const user = await usersModel.findById(id).select("-password")
-    if(!user){
+    if (!user) {
         throw new Error("User Not Found")
     }
     const posts = await postsModel.find({ authorId: user._id })
@@ -89,25 +89,26 @@ export const deleteUser = asyncHandler(async (req, res) => {
 export const addFirend = asyncHandler(async (req, res) => {
     const { user } = req;
     const { user_id } = req.body
+    let param;
     console.log(user);
-    if(user._id == user_id){
+    if (user._id == user_id) {
         throw new Error('can not add your self');
     }
     const recivedUser = await usersModel.findById(user_id)
-    if(!recivedUser){
+    if (!recivedUser) {
         throw new Error('user not found');
     }
     console.log(typeof recivedUser);
-    if(!recivedUser.firendRequest.includes(user._id)){
+    if (!recivedUser.firendRequest.includes(user._id)) {
         recivedUser.firendRequest.push(user._id)
-        let param = "friend request sent"
-    }else{
+        param = "friend request sent"
+    } else {
         console.log(user._id);
-        recivedUser.firendRequest = recivedUser.firendRequest.filter((ele) => ele.toString() !== user._id.toString());   
-        let param = "friend request Canceld"
-     }
+        recivedUser.firendRequest = recivedUser.firendRequest.filter((ele) => ele.toString() !== user._id.toString());
+        param = "friend request Canceld"
+    }
     await recivedUser.save();
-    res.json({message:"success", param, recivedUser})
+    res.json({ message: "success", param, recivedUser })
 })
 
 

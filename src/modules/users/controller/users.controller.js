@@ -88,13 +88,24 @@ export const deleteUser = asyncHandler(async (req, res) => {
 
 export const addFirend = asyncHandler(async (req, res) => {
     const { user } = req;
-    const { id } = req.body
-    const user2 = usersModel.findById(id)
-    if(!user2){
+    const { user_id } = req.body
+    console.log(user);
+    if(user._id == user_id){
+        throw new Error('can not add your self');
+    }
+    const recivedUser = await usersModel.findById(user_id)
+    if(!recivedUser){
         throw new Error('user not found');
     }
-
-    user2.updateOne({$push: {firendRequest: user._id}})
+    console.log(typeof recivedUser);
+    if(!recivedUser.firendRequest.includes(user._id)){
+        recivedUser.firendRequest.push(user._id)
+    }else{
+        console.log(user._id);
+        recivedUser.firendRequest = recivedUser.firendRequest.filter((ele) => ele.toString() !== user._id.toString());   
+     }
+    await recivedUser.save();
+    res.json({message:"success", param:"friend request sent", recivedUser})
 })
 
 

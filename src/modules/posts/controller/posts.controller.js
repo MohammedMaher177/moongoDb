@@ -123,36 +123,55 @@ export const addPostComments = asyncHandler(async (req, res) => {
 export const postlike = asyncHandler(async (req, res, next) => {
     const { postId } = req.body;
     const userId = req.user._id;
+    let param = ''
     const user = await usersModel.findById(userId);
     if (!user) {
         return next(new Error("In-Valid user ID"))
     }
-    const checkPost = await postsModel.findById(postId)
-    if (!checkPost) {
+    const post = await postsModel.findById(postId)
+    if (!post) {
         return next(new Error("In-Valid Post ID"))
     }
-    console.log(checkPost);
-    if (checkPost.postLikes.includes(userId)) {
-
-        const post = await postsModel.findByIdAndUpdate(postId, {
-            $pull:
-            {
-                postLikes: userId
-            }
-        },
-            { new: true })
-        return res.json({ message: 'success', param: "Un Like", post });
+    console.log(post);
+    if (post.postLikes.includes(userId)) {
+        post.postLikes = post.postLikes.filter((ele) => ele.toString() !== userId.toString())
+        await post.save()
+        param = "Un Like"
+        // return res.json({ message: 'success', param: "Un Like", post });
     } else {
-
-        const post = await postsModel.findByIdAndUpdate(postId,
-            {
-                $push:
-                {
-                    postLikes: userId
-                }
-            },
-            { new: true })
-        return res.json({ message: 'success', param: "Like", post });
+        post.postLikes.push(userId)
+        await post.save()
+        param = "Like"
     }
+    return res.json({ message: 'success', param: param, post });
     // .populate('postLikes');
 })
+
+
+
+
+// if (checkPost.postLikes.includes(userId)) {
+//     post.postLikes = post.postLikes.filter((ele) => ele.toString() !== userId.toString())
+//     // const post = await postsModel.findByIdAndUpdate(postId, {
+//     //     $pull:
+//     //     {
+//     //         postLikes: userId
+//     //     }
+//     // },
+//     //     { new: true })
+//     await post.save()
+//     return res.json({ message: 'success', param: "Un Like", post });
+// } else {
+
+//     post.postLikes.push(userId)
+//     // const post = await postsModel.findByIdAndUpdate(postId,
+//     //     {
+//     //         $push:
+//     //         {
+//     //             postLikes: userId
+//     //         }
+//     //     },
+//     //     { new: true })
+//     await post.save()
+//     return res.json({ message: 'success', param: "Like", post });
+// }

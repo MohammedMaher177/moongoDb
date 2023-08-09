@@ -100,12 +100,14 @@ export const addFirend = asyncHandler(async (req, res) => {
     console.log(typeof recivedUser);
     if(!recivedUser.firendRequest.includes(user._id)){
         recivedUser.firendRequest.push(user._id)
+        let param = "friend request sent"
     }else{
         console.log(user._id);
         recivedUser.firendRequest = recivedUser.firendRequest.filter((ele) => ele.toString() !== user._id.toString());   
+        let param = "friend request Canceld"
      }
     await recivedUser.save();
-    res.json({message:"success", param:"friend request sent", recivedUser})
+    res.json({message:"success", param, recivedUser})
 })
 
 

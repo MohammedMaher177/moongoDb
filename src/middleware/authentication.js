@@ -11,11 +11,11 @@ import { parse } from "dotenv";
 
 
 export const auth = asyncHandler(async (req, res, next) => {
-    const { authorizathion } = req.headers;
-    if (!authorizathion) {
-        return next(new Error("authorizathion is required"))
+    const { authorization } = req.headers;
+    if (!authorization) {
+        return next(new Error("authorization is required"))
     }
-    const decoded = jwt.verify(authorizathion, process.env.TOKEN_SIGNTURE)
+    const decoded = jwt.verify(authorization, process.env.TOKEN_SIGNTURE)
 
     if (!decoded?.id) {
         return next(new Error("Invalid Token payload"))

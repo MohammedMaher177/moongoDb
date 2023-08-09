@@ -10,7 +10,8 @@ const usersSchema = new Schema({
     phone:String,
     gender:{ type: String, enum:['Male', 'Female', 'Not Selected'] },
     confirmEmail:{ type: Boolean, default: false },
-    firends:{type: [Types.ObjectId], require: true}
+    firends:{type: [Types.ObjectId], default:[], ref:"user"},
+    firendRequest:{type: [Types.ObjectId], default:[], ref:"user"}
 },{ timestamps: true })
 
 const usersModel = model("user", usersSchema)

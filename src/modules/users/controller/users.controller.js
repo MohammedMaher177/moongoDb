@@ -15,6 +15,9 @@ export const getALlUsers = asyncHandler(async (req, res) => {
 export const getUserById = asyncHandler(async (req, res) => {
     const { id } = req.params
     const user = await usersModel.findById(id).select("-password")
+    if(!user){
+        throw new Error("User Not Found")
+    }
     const posts = await postsModel.find({ authorId: user._id })
     res.json({ message: "success", user, posts })
 }
@@ -56,7 +59,7 @@ export const login = asyncHandler(async (req, res) => {
     }
     const token = jwt.sign({ id: user._id, name: user.name, email: user.email }, process.env.TOKEN_SIGNTURE)
     user.password = ''
-    return res.json({ message: "success", token , user})
+    return res.json({ message: "success", token, user })
 })
 //3-update user
 export const updateUser = asyncHandler((async (req, res) => {
@@ -81,6 +84,17 @@ export const deleteUser = asyncHandler(async (req, res) => {
         return res.json({ message: "not found" })
 
     }
+})
+
+export const addFirend = asyncHandler(async (req, res) => {
+    const { user } = req;
+    const { id } = req.body
+    const user2 = usersModel.findById(id)
+    if(!user2){
+        throw new Error('user not found');
+    }
+
+    user2.updateOne({$push: {firendRequest: user._id}})
 })
 
 

@@ -15,6 +15,6 @@ router.post("/signup", addUser)
 router.post("/login", login)
 router.put("/updateUser", auth, updateUser)
 router.delete("/deleteUser/:id", auth, deleteUser)
-router.get("/addfirend", auth, addFirend)
+router.post("/addfirend", auth, addFirend)
 
 export default router;

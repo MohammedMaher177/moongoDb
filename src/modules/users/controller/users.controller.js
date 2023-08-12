@@ -86,7 +86,28 @@ export const deleteUser = asyncHandler(async (req, res) => {
     }
 })
 
-export const addFirend = asyncHandler(async (req, res) => {
+
+
+/*P
+5-search for user where his name start with "X" and age less than Y=>   (X,Y => variables)
+6-search for user where his age is between X and Y
+ */
+
+export const searchByName = asyncHandler((async (req, res) => {
+    const { name } = req.body
+    usersModel.find({ name: { $regex: `^${name}`, $options: 'i' } })
+        .then(users => {
+            res.json({ message: "success", users })
+        })
+        .catch(err => {
+            return res.json({ message: "not found", err })
+        });
+
+}
+)
+)
+
+export const addFriend = asyncHandler(async (req, res) => {
     const { user } = req;
     const { user_id } = req.body
     let param;
@@ -112,23 +133,26 @@ export const addFirend = asyncHandler(async (req, res) => {
 })
 
 
+export const acceptFriend = asyncHandler(async(req, res)=>{
+    const { user } = req;
+    const { user_id } = req.body
+    if(user._id == user_id){
+        throw new Error("can not add your self")
+    }
+    if(!user.firendRequest.includes(user_id)){
+        throw new Error("In-Valid user_id")
+    }
+    user.firends.push(user_id)
+    await user.save()
+    user.firendRequest = user.firendRequest.filter(ele => ele != user_id)
+    await user.save()
+    res.json({message:"success", param : "Firend Request Accepted"})
+})
 
-
-/*P
-5-search for user where his name start with "X" and age less than Y=>   (X,Y => variables)
-6-search for user where his age is between X and Y
- */
-
-export const searchByName = asyncHandler((async (req, res) => {
-    const { name } = req.body
-    usersModel.find({ name: { $regex: `^${name}`, $options: 'i' } })
-        .then(users => {
-            res.json({ message: "success", users })
-        })
-        .catch(err => {
-            return res.json({ message: "not found", err })
-        });
-
-}
-)
-)
+export const rejectFriend = asyncHandler(async(req, res)=>{
+    const { user } = req;
+    const { user_id } = req.body
+    user.firendRequest = user.firendRequest.filter(ele => ele != user_id)
+    await user.save()
+    res.json({message:"success", param : "Firend Request Rejected"})
+})

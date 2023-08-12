@@ -132,27 +132,36 @@ export const addFriend = asyncHandler(async (req, res) => {
     res.json({ message: "success", param, recivedUser })
 })
 
+export const friendRequests = asyncHandler(async (req, res) => {
+    const { _id } = req.user;
+    const user = await usersModel.findById(_id).select("firendRequest").populate([{
+            path: "firendRequest",
+            select:"name email"
+        }])
+    res.json(user)
 
-export const acceptFriend = asyncHandler(async(req, res)=>{
+})
+
+export const acceptFriend = asyncHandler(async (req, res) => {
     const { user } = req;
     const { user_id } = req.body
-    if(user._id == user_id){
+    if (user._id == user_id) {
         throw new Error("can not add your self")
     }
-    if(!user.firendRequest.includes(user_id)){
+    if (!user.firendRequest.includes(user_id)) {
         throw new Error("In-Valid user_id")
     }
     user.firends.push(user_id)
     await user.save()
     user.firendRequest = user.firendRequest.filter(ele => ele != user_id)
     await user.save()
-    res.json({message:"success", param : "Firend Request Accepted"})
+    res.json({ message: "success", param: "Firend Request Accepted", firendRequest : user.firendRequest})
 })
 
-export const rejectFriend = asyncHandler(async(req, res)=>{
+export const rejectFriend = asyncHandler(async (req, res) => {
     const { user } = req;
     const { user_id } = req.body
     user.firendRequest = user.firendRequest.filter(ele => ele != user_id)
     await user.save()
-    res.json({message:"success", param : "Firend Request Rejected"})
+    res.json({ message: "success", param: "Firend Request Rejected" })
 })

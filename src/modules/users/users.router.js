@@ -19,6 +19,6 @@ router.post("/addfriend", auth, addFriend)
 router.get("/friendrequests", auth, friendRequests)
 router.post("/acceptfriend", auth, acceptFriend)
 router.post("/rejectfriend", auth, rejectFriend)
-router.post("/verifyemail/:verifyToken", verify)
+router.get("/verifyemail/:verifyToken", verify)
 
 export default router;

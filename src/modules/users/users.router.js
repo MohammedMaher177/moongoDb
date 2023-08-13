@@ -1,5 +1,5 @@
 import { Router } from "express"
-import { acceptFriend,  addFriend, addUser, deleteUser, friendRequests, getALlUsers, getUserById, login, rejectFriend, search, searchByName, updateUser } from "./controller/users.controller.js";
+import { acceptFriend, addFriend, addUser, deleteUser, friendRequests, getALlUsers, getUserById, login, rejectFriend, search, searchByName, updateUser, verify } from "./controller/users.controller.js";
 import { auth } from "../../middleware/authentication.js";
 
 
@@ -19,5 +19,6 @@ router.post("/addfriend", auth, addFriend)
 router.get("/friendrequests", auth, friendRequests)
 router.post("/acceptfriend", auth, acceptFriend)
 router.post("/rejectfriend", auth, rejectFriend)
+router.post("/verifyemail/:verifyToken", verify)
 
 export default router;

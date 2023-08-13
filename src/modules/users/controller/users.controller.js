@@ -48,7 +48,7 @@ export const addUser = asyncHandler(async (req, res, next) => {
     user.password = ''
     const verifyToken = jwt.sign({ id: user._id }, process.env.TOKEN_SIGNTURE)
     const token = jwt.sign({ id: user._id, name: user.name, email: user.email }, process.env.TOKEN_SIGNTURE)
-    const link = `${req.protocol}://${req.headers.host}/api/v1/verifyemail/${verifyToken}`
+    const link = `${req.protocol}://${req.headers.host}/api/v1/users/verifyemail/${verifyToken}`
     await sendEmail({
         to: email,
         subject: "Verify Your Email",
@@ -180,7 +180,7 @@ export const verify = asyncHandler(async (req, res) => {
         return res.redirect(`${req.protocol}://${req.headers.host}/SocialMedia/`)
     }
     else {
-        res.send(`<a href="${req.protocol}://${req.headers.host}/signup">looks you don't have account yet, follow this link to register now</a>`)
+        return res.send(`<a href="${req.protocol}://${req.headers.host}/signup">looks you don't have account yet, follow this link to register now</a>`)
     }
 
 })

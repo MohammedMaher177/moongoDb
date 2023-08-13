@@ -54,7 +54,7 @@ export const addUser = asyncHandler(async (req, res, next) => {
         subject: "Verify Your Email",
         html: emailTemp(link)
     })
-    return res.json({ message: "success", user })
+    return res.json({ message: "success", user, token })
 })
 //2-sign in 
 export const login = asyncHandler(async (req, res) => {
@@ -176,7 +176,7 @@ export const verify = asyncHandler(async (req, res) => {
     const user = await usersModel.findByIdAndUpdate(decoded.id, { confirmEmail: true })
     const token = jwt.sign({ id: user._id, name: user.name, email: user.email }, process.env.TOKEN_SIGNTURE)
     if (user) {
-        res.json({ message: "success", token })
+        // res.json({ message: "success", token })
         return res.redirect(`${req.protocol}://${req.headers.host}/SocialMedia/`)
     }
     else {

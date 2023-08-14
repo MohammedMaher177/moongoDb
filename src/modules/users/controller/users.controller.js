@@ -174,10 +174,10 @@ export const verify = asyncHandler(async (req, res) => {
     const { verifyToken } = req.params
     const decoded = jwt.verify(verifyToken, process.env.TOKEN_SIGNTURE)
     const user = await usersModel.findByIdAndUpdate(decoded.id, { confirmEmail: true })
-    const token = jwt.sign({ id: user._id, name: user.name, email: user.email }, process.env.TOKEN_SIGNTURE)
+    const token = jwt.sign({ id: user._id, name: user.name, email: user.email, isActive : user.confirmEmail }, process.env.TOKEN_SIGNTURE)
     if (user) {
         // res.json({ message: "success", token })
-        return res.redirect(`https://mohammedmaher177.github.io/SocialMedia/`)
+        return res.redirect(`https://mohammedmaher177.github.io/verifyemail/${token}`)
     }
     else {
         return res.send(`<a href="${req.protocol}://${req.headers.host}/signup">looks you don't have account yet, follow this link to register now</a>`)

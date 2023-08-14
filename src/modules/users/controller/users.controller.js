@@ -56,6 +56,21 @@ export const addUser = asyncHandler(async (req, res, next) => {
     })
     return res.json({ message: "success", user, token })
 })
+
+export const verify = asyncHandler(async (req, res) => {
+    const { verifyToken } = req.params
+    const decoded = jwt.verify(verifyToken, process.env.TOKEN_SIGNTURE)
+    const user = await usersModel.findByIdAndUpdate(decoded.id, { confirmEmail: true })
+    const token = jwt.sign({ id: user._id, name: user.name, email: user.email, isActive : user.confirmEmail }, process.env.TOKEN_SIGNTURE)
+    if (user) {
+        // res.json({ message: "success", token })
+        return res.redirect(`https://mohammedmaher177.github.io/SocialMedia/#/auth/verifyemail/${token}`)
+    }
+    else {
+        return res.send(`<a href="${req.protocol}://${req.headers.host}/signup">looks you don't have account yet, follow this link to register now</a>`)
+    }
+
+})
 //2-sign in 
 export const login = asyncHandler(async (req, res) => {
     const { email, password } = req.body
@@ -170,17 +185,3 @@ export const rejectFriend = asyncHandler(async (req, res) => {
     res.json({ message: "success", param: "Firend Request Rejected" })
 })
 
-export const verify = asyncHandler(async (req, res) => {
-    const { verifyToken } = req.params
-    const decoded = jwt.verify(verifyToken, process.env.TOKEN_SIGNTURE)
-    const user = await usersModel.findByIdAndUpdate(decoded.id, { confirmEmail: true })
-    const token = jwt.sign({ id: user._id, name: user.name, email: user.email, isActive : user.confirmEmail }, process.env.TOKEN_SIGNTURE)
-    if (user) {
-        // res.json({ message: "success", token })
-        return res.redirect(`https://mohammedmaher177.github.io/auth/verifyemail/${token}`)
-    }
-    else {
-        return res.send(`<a href="${req.protocol}://${req.headers.host}/signup">looks you don't have account yet, follow this link to register now</a>`)
-    }
-
-})

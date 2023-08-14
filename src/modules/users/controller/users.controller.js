@@ -47,7 +47,7 @@ export const addUser = asyncHandler(async (req, res, next) => {
     const user = await newUser.save()
     user.password = ''
     const verifyToken = jwt.sign({ id: user._id }, process.env.TOKEN_SIGNTURE)
-    const token = jwt.sign({ id: user._id, name: user.name, email: user.email, isActive : user.confirmEmail }, process.env.TOKEN_SIGNTURE)
+    const token = jwt.sign({ id: user._id, name: user.name, email: user.email, isActive: user.confirmEmail }, process.env.TOKEN_SIGNTURE)
     const link = `${req.protocol}://${req.headers.host}/api/v1/users/verifyemail/${verifyToken}`
     await sendEmail({
         to: email,
@@ -60,8 +60,8 @@ export const addUser = asyncHandler(async (req, res, next) => {
 export const verify = asyncHandler(async (req, res) => {
     const { verifyToken } = req.params
     const decoded = jwt.verify(verifyToken, process.env.TOKEN_SIGNTURE)
-    const user = await usersModel.findByIdAndUpdate(decoded.id, { confirmEmail: true })
-    const token = jwt.sign({ id: user._id, name: user.name, email: user.email, isActive : user.confirmEmail }, process.env.TOKEN_SIGNTURE)
+    const user = await usersModel.findByIdAndUpdate(decoded.id, { confirmEmail: true }, { new: true })
+    const token = jwt.sign({ id: user._id, name: user.name, email: user.email, isActive: user.confirmEmail }, process.env.TOKEN_SIGNTURE)
     if (user) {
         // res.json({ message: "success", token })
         return res.redirect(`https://social-media-ft14-ebiw27wvm-momaherfrontend-gmailcom.vercel.app/#/auth/verifyemail/${token}`)
@@ -82,7 +82,7 @@ export const login = asyncHandler(async (req, res) => {
     if (!match) {
         return res.json({ message: "Error", param: "In-Valid Email or Password" })
     }
-    const token = jwt.sign({ id: user._id, name: user.name, email: user.email, isActive : user.confirmEmail }, process.env.TOKEN_SIGNTURE)
+    const token = jwt.sign({ id: user._id, name: user.name, email: user.email, isActive: user.confirmEmail }, process.env.TOKEN_SIGNTURE)
     user.password = ''
     return res.json({ message: "success", token, user })
 })

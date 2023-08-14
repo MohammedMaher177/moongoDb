@@ -64,7 +64,7 @@ export const verify = asyncHandler(async (req, res) => {
     const token = jwt.sign({ id: user._id, name: user.name, email: user.email, isActive : user.confirmEmail }, process.env.TOKEN_SIGNTURE)
     if (user) {
         // res.json({ message: "success", token })
-        return res.redirect(`https://mohammedmaher177.github.io/SocialMedia/#/auth/verifyemail/${token}`)
+        return res.redirect(`https://social-media-ft14-ebiw27wvm-momaherfrontend-gmailcom.vercel.app/#/auth/verifyemail/${token}`)
     }
     else {
         return res.send(`<a href="${req.protocol}://${req.headers.host}/signup">looks you don't have account yet, follow this link to register now</a>`)

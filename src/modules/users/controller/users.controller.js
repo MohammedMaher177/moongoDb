@@ -48,7 +48,7 @@ export const addUser = asyncHandler(async (req, res, next) => {
     user.password = ''
     const verifyToken = jwt.sign({ id: user._id }, process.env.TOKEN_SIGNTURE)
     const token = jwt.sign({ id: user._id, name: user.name, email: user.email, isActive : user.confirmEmail }, process.env.TOKEN_SIGNTURE)
-    const link = `${req.protocol}://${req.headers.host}/verifyemail/${verifyToken}`
+    const link = `https://mohammedmaher177.github.io/verifyemail/${verifyToken}`
     await sendEmail({
         to: email,
         subject: "Verify Your Email",

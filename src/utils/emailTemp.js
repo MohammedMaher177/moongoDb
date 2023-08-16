@@ -1,6 +1,6 @@
 
  
-export const emailTemp = (link )=>{
+export const emailTemp = ( link )=>{
     return `<!DOCTYPE html>
     <html>
     <head>

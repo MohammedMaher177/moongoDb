@@ -6,19 +6,59 @@ import asyncHandler from 'express-async-handler'
 import postsModel from "../../../../DB/posts.model.js"
 import sendEmail from "../../../utils/email.js";
 import { emailTemp } from "../../../utils/emailTemp.js";
+import { AppError } from "../../../utils/AppError.js";
+import { deleteOneDoc } from "../../handller/factor.js";
 
 
 // 7-get all user 
 export const getALlUsers = asyncHandler(async (req, res) => {
-    const users = await usersModel.find().select("-password")
-    res.json({ message: "success", users })
+    //1 - pag
+    const PAGE_LIMIT = req.query.page ? 3 : true;
+    const PAGE_NUMBER = req.query.page * 1 || 1
+    if (PAGE_NUMBER <= 0) PAGE_NUMBER = 1
+    const SKIP = (PAGE_NUMBER - 1) * PAGE_LIMIT
+    //2 - filter
+    // console.log(req.query);
+    let filterObj = { ...req.query }
+    const delObj = ['page', 'sort', 'fields', 'keyword']
+    delObj.forEach(ele => {
+        delete filterObj[ele]
+    })
+    filterObj = JSON.stringify(filterObj)
+    filterObj = filterObj.replace(/\b(gt|gte|lt|lte)\b/g, match => `$${match}`)
+    filterObj = JSON.parse(filterObj)
+
+    const mongooseQuery = usersModel.find(filterObj).skip(SKIP).limit(PAGE_LIMIT).select("-password")
+    //3 - sort
+    if (req.query.sort) {
+        let sortedQery = req.query.sort.split(",").join(" ")
+        mongooseQuery.sort(sortedQery)
+    }
+
+    //4 - search
+    if (req.query.keyword) {
+        mongooseQuery.find({
+            $or: [
+                { name: { $regex: req.query.keyword, $options: "i" } },
+                { email: { $regex: req.query.keyword, $options: "i" } },
+                { gender: { $regex: req.query.keyword, $options: "i" } }
+            ]
+        })
+    }
+    //5 - fields
+    if (req.query.fields) {
+        let fieldsQery = req.query.fields.split(",").join(" ")
+        mongooseQuery.select(fieldsQery)
+    }
+    const users = await mongooseQuery
+    res.json({ message: "success", page: PAGE_NUMBER, users })
 }
 )
 export const getUserById = asyncHandler(async (req, res) => {
     const { id } = req.params
     const user = await usersModel.findById(id).select("-password")
     if (!user) {
-        throw new Error("User Not Found")
+        throw new AppError("User Not Found", 404)
     }
     const posts = await postsModel.find({ authorId: user._id })
     res.json({ message: "success", user, posts })
@@ -97,19 +137,7 @@ export const updateUser = asyncHandler((async (req, res) => {
 })
 )
 //4-delete user
-export const deleteUser = asyncHandler(async (req, res) => {
-    const { id } = req.params
-    // return res.json({message: "success", name, email, password, age, gender, id})
-
-    const users = await usersModel.deleteOne({ _id: id })
-    if (users.deletedCount) {
-
-        return res.json({ message: "success", users })
-    } else {
-        return res.json({ message: "not found" })
-
-    }
-})
+export const deleteUser = deleteOneDoc(usersModel, "user")
 
 /*P
 5-search for user where his name start with "X" and age less than Y=>   (X,Y => variables)
@@ -133,11 +161,11 @@ export const addFriend = asyncHandler(async (req, res) => {
     let param;
     console.log(user);
     if (user._id == user_id) {
-        throw new Error('can not add your self');
+        throw new AppError('can not add your self', 405);
     }
     const recivedUser = await usersModel.findById(user_id)
     if (!recivedUser) {
-        throw new Error('user not found');
+        throw new AppError('user not found', 404);
     }
     if (!recivedUser.firendRequest.includes(user._id)) {
         recivedUser.firendRequest.push(user._id)
@@ -158,17 +186,16 @@ export const friendRequests = asyncHandler(async (req, res) => {
         select: "name email"
     }])
     res.json(user)
-
 })
 
 export const acceptFriend = asyncHandler(async (req, res) => {
     const { user } = req;
     const { user_id } = req.body
     if (user._id == user_id) {
-        throw new Error("can not add your self")
+        throw new AppError("can not add your self", 405)
     }
     if (!user.firendRequest.includes(user_id)) {
-        throw new Error("In-Valid user_id")
+        throw new AppError("In-Valid user_id", 400)
     }
     user.firends.push(user_id)
     await user.save()
